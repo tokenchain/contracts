@@ -1,4 +1,7 @@
-from binom import coefficients
+from common import getMaxExpArray
+from common import binarySearch
+from common import fixedExpSafe
+from common import safeMul
 
 
 MIN_PRECISION = 32
@@ -9,49 +12,11 @@ NUM_OF_VALUES_PER_ROW = 4
 assert((MAX_PRECISION+1) % NUM_OF_VALUES_PER_ROW == 0)
 
 
-def fixedExpUnsafe(x,precision):
-    xi = x
-    res = safeMul(coefficients[0],1 << precision)
-    for coefficient in coefficients[1:-1]:
-        res = safeAdd(res,safeMul(xi,coefficient))
-        xi = safeMul(xi,x) >> precision
-    res = safeAdd(res,safeMul(xi,coefficients[-1]))
-    return res / coefficients[0]
-
-
-def safeMul(x,y):
-    assert(x * y < (1 << 256))
-    return x * y
-
-
-def safeAdd(x,y):
-    assert(x + y < (1 << 256))
-    return x + y
-
-
-def binarySearch(func,args):
-    lo = 1
-    hi = 1 << 256
-    while lo+1 < hi:
-        mid = (lo+hi)/2
-        try:
-            func(mid,args)
-            lo = mid
-        except Exception,error:
-            hi = mid
-    try:
-        func(hi,args)
-        return hi
-    except Exception,error:
-        func(lo,args)
-        return lo
-
-
 def getMaxExp(precision,factor):
     maxExp = maxExpArray[MIN_PRECISION]
     for p in range (MIN_PRECISION,precision):
         maxExp = safeMul(maxExp,factor) >> MAX_PRECISION
-        fixedExpUnsafe(maxExp,precision)
+        fixedExpSafe(maxExp,precision)
     return maxExp
 
 
@@ -60,14 +25,8 @@ def assertFactor(factor,args):
         getMaxExp(precision,factor)
 
 
-maxExpArray = [0]*(MAX_PRECISION+1)
-for precision in range(MAX_PRECISION+1):
-    maxExpArray[precision] = binarySearch(fixedExpUnsafe,precision)
-
-
+maxExpArray = getMaxExpArray(MAX_PRECISION+1)
 growthFactor = binarySearch(assertFactor,None)
-
-
 maxMaxExpLen = len('0x{:x}'.format(maxExpArray[-1]))
 
 

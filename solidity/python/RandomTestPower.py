@@ -5,8 +5,7 @@ import FormulaNativePython
 
 
 def powerTest(baseN,baseD,expN,expD):
-    precision = FormulaSolidityPort.calculateBestPrecision(baseN,baseD,expN,expD)
-    resultSolidityPort = FormulaSolidityPort.power(baseN,baseD,expN,expD,precision)
+    resultSolidityPort,precision = FormulaSolidityPort.power(baseN,baseD,expN,expD)
     resultNativePython = FormulaNativePython.power(baseN,baseD,expN,expD,precision)
     if resultSolidityPort > resultNativePython:
         error = ['Implementation Error:']
@@ -32,8 +31,8 @@ numOfFailures = 0
 for n in xrange(size):
     baseN = random.randrange(2,10**26)
     baseD = random.randrange(1,baseN)
-    expN  = random.randrange(1,100)
-    expD  = random.randrange(expN,101)
+    expN  = random.randrange(1,1000000)
+    expD  = random.randrange(expN,1000001)
     try:
         accuracy = powerTest(baseN,baseD,expN,expD)
         worstAccuracy = min(worstAccuracy,accuracy)

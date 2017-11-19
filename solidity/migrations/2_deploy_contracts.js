@@ -10,8 +10,10 @@ const EtherToken = artifacts.require('EtherToken.sol');
 const SmartToken = artifacts.require('SmartToken.sol');
 const SmartTokenController = artifacts.require('SmartTokenController.sol');
 const BancorFormula = artifacts.require('BancorFormula.sol');
-const BancorFormulaProxy = artifacts.require('BancorFormulaProxy.sol');
-const BancorChanger = artifacts.require('BancorChanger.sol');
+const BancorGasPriceLimit = artifacts.require('BancorGasPriceLimit.sol');
+const BancorQuickConverter = artifacts.require('BancorQuickConverter.sol');
+const BancorConverterExtensions = artifacts.require('BancorConverterExtensions.sol');
+const BancorConverter = artifacts.require('BancorConverter.sol');
 const CrowdsaleController = artifacts.require('CrowdsaleController.sol');
 
 module.exports = async (deployer) => {
@@ -24,7 +26,9 @@ module.exports = async (deployer) => {
     await deployer.deploy(SmartToken, 'Token1', 'TKN1', 2);
     deployer.deploy(SmartTokenController, SmartToken.address);
     deployer.deploy(BancorFormula);
-    deployer.deploy(BancorFormulaProxy, '0x125463');
-    deployer.deploy(BancorChanger, SmartToken.address, '0x124', 0, '0x0', 0);
+    deployer.deploy(BancorGasPriceLimit, '22000000000');
+    deployer.deploy(BancorQuickConverter);
+    deployer.deploy(BancorConverterExtensions, '0x125463', '0x145463', '0x125763');
+    deployer.deploy(BancorConverter, SmartToken.address, '0x124', 0, '0x0', 0);
     deployer.deploy(CrowdsaleController, SmartToken.address, 4102444800, '0x125', '0x126', 1);
 };
